@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 상세 - うわさ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="logo"><a th:href="@{/}">うわさ</a></div>
+        <div class="header-right">
+            <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+			<th:block th:if="${#authentication == null or #authentication.name == 'anonymousUser'}">
+				            <a th:href="@{/user/login}" class="btn btn-outline">로그인</a>
+				            <a th:href="@{/user/join}" class="btn">회원가입</a>
+				        </th:block>
+				        <th:block th:if="${#authentication != null and #authentication.name != 'anonymousUser'}">
+				            <a th:href="@{/user/mypage}" class="btn btn-outline">마이페이지</a>
+				            <a th:href="@{/user/logout}" class="btn">로그아웃</a>
+				        </th:block>
+        </div>
+    </header>
+
+    <main>
+        <div class="read-wrap">
+            <div class="read-header">
+                <span class="post-nickname" th:text="${inquiry.nickname}">닉네임</span>
+                <span class="post-time" th:text="${#temporals.format(inquiry.createdAt, 'MM/dd HH:mm')}">시간</span>
+            </div>
+
+            <h2 class="read-title" th:text="${inquiry.title}">제목</h2>
+            <div class="read-content" th:text="${inquiry.content}">내용</div>
+
+            <div th:if="${inquiry.isAnswered == 1}" class="answer-wrap">
+                <h3 class="section-title">📨 관리자 답변</h3>
+                <div class="answer-content" th:text="${inquiry.answer}">답변 내용</div>
+                <div class="post-time" th:text="${#temporals.format(inquiry.answeredAt, 'MM/dd HH:mm')}">답변 시간</div>
+            </div>
+
+            <div th:if="${inquiry.isAnswered == 0}" class="consumed-msg">
+                ⏳ 아직 답변이 등록되지 않았습니다.
+            </div>
+
+            <div class="back-wrap">
+                <a th:href="@{/inquiry/list}" class="btn">← 목록으로</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a th:href="@{/terms}">이용약관</a>
+            <a th:href="@{/privacy}">개인정보처리방침</a>
+			<a th:href="@{/inquiry/write}">문의하기</a>
+        </div>
+        <div class="footer-copy">© 2026 todtnwater うわさ</div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

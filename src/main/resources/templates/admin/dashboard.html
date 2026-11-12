@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - うわさ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="logo"><a th:href="@{/}">うわさ</a></div>
+        <div class="header-right">
+            <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+            <a th:href="@{/admin/inquiries}" class="btn btn-outline">📬 문의</a>
+            <a th:href="@{/admin/reports}" class="btn btn-outline">🚨 신고</a>
+            <a th:href="@{/user/logout}" class="btn">로그아웃</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-wrap">
+            <h2 class="section-title">🔒 IP 밴 관리</h2>
+
+            <form th:action="@{/admin/ban}" method="post" class="ban-form">
+                <div class="form-group">
+                    <label>IP 주소</label>
+                    <input type="text" name="ip" placeholder="xxx.xxx.xxx.xxx" required>
+                </div>
+                <div class="form-group">
+                    <label>사유</label>
+                    <input type="text" name="reason" placeholder="밴 사유">
+                </div>
+                <div class="form-group">
+                    <label>만료 시간 (비워두면 영구)</label>
+                    <input type="datetime-local" name="expiredAt">
+                </div>
+                <button type="submit" class="btn">밴 적용</button>
+            </form>
+
+            <h3 class="section-title">밴 목록</h3>
+
+            <div th:if="${bannedIps.isEmpty()}" class="empty-msg">
+                밴된 IP가 없습니다.
+            </div>
+
+            <div th:each="ban : ${bannedIps.content}" class="ban-card">
+                <div class="ban-info">
+                    <span class="ban-ip" th:text="${ban.ip}">IP</span>
+                    <span class="ban-reason" th:text="${ban.reason}">사유</span>
+                    <span class="ban-expired" th:text="${ban.expiredAt != null ? #temporals.format(ban.expiredAt, 'MM/dd HH:mm') : '영구'}">만료</span>
+                </div>
+                <form th:action="@{/admin/unban}" method="post">
+                    <input type="hidden" name="banId" th:value="${ban.banId}">
+                    <button type="submit" class="btn btn-outline">해제</button>
+                </form>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination-wrap">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/admin/dashboard(page=${currentPage - 1})}"
+                   class="btn btn-outline">▲</a>
+                <span th:text="${currentPage + 1} + ' / ' + ${bannedIps.totalPages}">1 / 1</span>
+                <a th:if="${currentPage + 1 < bannedIps.totalPages}"
+                   th:href="@{/admin/dashboard(page=${currentPage + 1})}"
+                   class="btn btn-outline">▼</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a th:href="@{/terms}">이용약관</a>
+            <a th:href="@{/privacy}">개인정보처리방침</a>
+            <a th:href="@{/inquiry/write}">문의하기</a>
+        </div>
+        <div class="footer-copy">© 2026 todtnwater うわさ</div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

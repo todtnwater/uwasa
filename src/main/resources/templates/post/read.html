@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소문 - うわさ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="logo"><a th:href="@{/}">うわさ</a></div>
+        <div class="header-right">
+            <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+			<th:block th:if="${#authentication == null or #authentication.name == 'anonymousUser'}">
+				            <a th:href="@{/user/login}" class="btn btn-outline">로그인</a>
+				            <a th:href="@{/user/join}" class="btn">회원가입</a>
+				        </th:block>
+				        <th:block th:if="${#authentication != null and #authentication.name != 'anonymousUser'}">
+				            <a th:href="@{/user/mypage}" class="btn btn-outline">마이페이지</a>
+				            <a th:href="@{/user/logout}" class="btn">로그아웃</a>
+				        </th:block>
+        </div>
+    </header>
+
+    <main>
+        <div class="read-wrap">
+            <div class="read-header">
+                <span class="post-nickname" th:text="${post.writerNickname}">닉네임</span>
+                <span class="post-time" th:text="${#temporals.format(post.createdAt, 'MM/dd HH:mm')}">시간</span>
+            </div>
+            <h2 class="read-title" th:text="${post.title}">제목</h2>
+            <div class="read-content" th:text="${post.content}">내용</div>
+
+            <div class="consumed-msg">
+                💀 이 소문은 방금 사라졌습니다.
+            </div>
+
+			<div class="reaction-wrap">
+			    <p>이 소문에 반응을 남기세요</p>
+			    <form th:action="@{/post/react}" method="post" id="reactionForm">
+			        <input type="hidden" name="postId" th:value="${post.postId}">
+			        <input type="hidden" name="reportReason" id="reportReasonInput">
+			        <div class="emoji-btns">
+			            <button type="submit" name="emoji" value="👍" class="emoji-btn">👍</button>
+			            <button type="submit" name="emoji" value="😱" class="emoji-btn">😱</button>
+			            <button type="submit" name="emoji" value="🤣" class="emoji-btn">🤣</button>
+			            <button type="submit" name="emoji" value="😢" class="emoji-btn">😢</button>
+			            <button type="button" class="emoji-btn" onclick="showReportModal()">🚨</button>
+			        </div>
+			    </form>
+			</div>
+
+			<!-- 신고 모달 -->
+			<div id="reportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+			     background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+			    <div style="background:var(--card-bg); border-radius:8px; padding:2rem; width:90%; max-width:400px;">
+			        <h3 style="margin-bottom:1rem;">🚨 신고 사유</h3>
+			        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+			            <label><input type="radio" name="reason" value="욕설/비하"> 욕설/비하</label>
+			            <label><input type="radio" name="reason" value="음란물"> 음란물</label>
+			            <label><input type="radio" name="reason" value="불법링크/피싱"> 불법링크/피싱</label>
+			            <label><input type="radio" name="reason" value="개인정보 유포"> 개인정보 유포</label>
+			            <label><input type="radio" name="reason" value="도배/스팸"> 도배/스팸</label>
+			            <label><input type="radio" name="reason" value="기타"> 기타</label>
+			        </div>
+			        <textarea id="reportDetail" placeholder="추가 설명 (선택사항)" rows="3"
+			            style="width:100%; padding:0.5rem; border:1px solid var(--border);
+			                   background:var(--input-bg); color:var(--text); border-radius:4px;
+			                   font-family:inherit; margin-bottom:1rem;"></textarea>
+			        <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+			            <button class="btn btn-outline" onclick="hideReportModal()">취소</button>
+			            <button class="btn" onclick="submitReport()">신고하기</button>
+			        </div>
+			    </div>
+			</div>
+
+			<script>
+			function showReportModal() {
+			    const modal = document.getElementById('reportModal');
+			    modal.style.display = 'flex';
+			}
+
+			function hideReportModal() {
+			    const modal = document.getElementById('reportModal');
+			    modal.style.display = 'none';
+			}
+
+			function submitReport() {
+			    const selected = document.querySelector('input[name="reason"]:checked');
+			    if (!selected) {
+			        alert('신고 사유를 선택해주세요.');
+			        return;
+			    }
+			    const detail = document.getElementById('reportDetail').value;
+			    const reason = selected.value + (detail ? ' - ' + detail : '');
+			    document.getElementById('reportReasonInput').value = reason;
+
+			    const form = document.getElementById('reactionForm');
+			    const hiddenEmoji = document.createElement('input');
+			    hiddenEmoji.type = 'hidden';
+			    hiddenEmoji.name = 'emoji';
+			    hiddenEmoji.value = '🚨';
+			    form.appendChild(hiddenEmoji);
+
+			    hideReportModal();
+			    form.submit();
+			}
+			</script>
+
+            <div class="back-wrap">
+                <a th:href="@{/}" class="btn">← 목록으로</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a th:href="@{/terms}">이용약관</a>
+            <a th:href="@{/privacy}">개인정보처리방침</a>
+			<a th:href="@{/inquiry/write}">문의하기</a>
+        </div>
+        <div class="footer-copy">© 2026 todtnwater うわさ</div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

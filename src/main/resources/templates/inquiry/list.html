@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 문의 목록 - うわさ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="logo"><a th:href="@{/}">うわさ</a></div>
+        <div class="header-right">
+            <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="mypage-wrap">
+            <h2 class="form-title">📬 내 문의 목록</h2>
+
+            <div class="write-btn-wrap" style="margin: 1rem 0;">
+                <a th:href="@{/inquiry/write}" class="btn">✏️ 문의하기</a>
+            </div>
+
+            <div th:if="${inquiries == null}" class="empty-msg">
+                로그인 후 문의 내역을 확인할 수 있습니다.
+            </div>
+
+            <div th:if="${inquiries != null}">
+                <div th:if="${inquiries.isEmpty()}" class="empty-msg">
+                    아직 문의 내역이 없습니다.
+                </div>
+
+                <div th:each="inquiry : ${inquiries.content}" class="my-post-card">
+                    <div class="my-post-header">
+                        <span th:text="${#temporals.format(inquiry.createdAt, 'MM/dd HH:mm')}">시간</span>
+                        <span th:if="${inquiry.isAnswered == 0}" class="badge-alive">답변 대기</span>
+                        <span th:if="${inquiry.isAnswered == 1}" class="badge-consumed">답변 완료</span>
+                    </div>
+                    <div class="my-post-title">
+                        <a th:href="@{/inquiry/detail/{id}(id=${inquiry.inquiryId})}"
+                           th:text="${inquiry.title}">제목</a>
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div class="pagination-wrap">
+                    <a th:if="${currentPage > 0}"
+                       th:href="@{/inquiry/list(page=${currentPage - 1})}"
+                       class="btn btn-outline">▲</a>
+                    <span th:text="${currentPage + 1} + ' / ' + ${inquiries.totalPages}">1 / 1</span>
+                    <a th:if="${currentPage + 1 < inquiries.totalPages}"
+                       th:href="@{/inquiry/list(page=${currentPage + 1})}"
+                       class="btn btn-outline">▼</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a th:href="@{/terms}">이용약관</a>
+            <a th:href="@{/privacy}">개인정보처리방침</a>
+            <a th:href="@{/inquiry/write}">문의하기</a>
+        </div>
+        <div class="footer-copy">© 2026 todtnwater うわさ</div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
