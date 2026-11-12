@@ -38,35 +38,50 @@
 
 ### システム構成
 
+~~
+ブラウザ
+   │ HTTPS
+   ▼
+Cloudflare Tunnel
+   │
+   ▼
+Webサーバー（Ubuntu Server）
+   └─ Spring Boot（uwasa.jar / systemdで常時稼働）
+         │ Tailscale（プライベートネットワーク）
+         ▼
+DBサーバー（Ubuntu Server）
+   └─ Oracle Database XE 21c（Docker）
+~~
+
 ### 工夫した点
 
 - **サーバーの分離**：WebサーバーとDBサーバーを別マシンに分け、DBはTailscaleのプライベートネットワーク経由でのみ接続するようにしました。
 - **機密情報の管理**：DB接続情報は `application-secret.properties` に分離し、Git管理対象から除外しています。
-- **自宅サーバーでの運用**：Windows ServerからUbuntu Serverへ移行し、systemdによる自動起動・常時稼働を構成しました。ポート開放をせず、Cloudflare Tunnelで公開しています。
+- **自宅サーバーでの運用**：WindowsからUbuntu Serverへ移行し、systemdによる自動起動・常時稼働を構成しました。ポート開放をせず、Cloudflare Tunnelで公開しています。
 - **荒らし対策**：管理者画面から特定IPをブロックできる機能を実装しました。
 
 ### ローカルでの実行方法
 
 1. リポジトリをクローン
 
-```bash
+~~bash
 git clone https://github.com/todtnwater/uwasa.git
 cd uwasa
-```
+~~
 
 2. DB接続情報ファイルを作成
 
-```bash
+~~bash
 cp src/main/resources/application-secret.properties.example src/main/resources/application-secret.properties
-```
+~~
 
 作成した `application-secret.properties` に、ご自身のDB接続情報を入力してください。
 
 3. 実行
 
-```bash
+~~bash
 ./mvnw spring-boot:run
-```
+~~
 
 `http://localhost:8083` でアクセスできます。
 
@@ -94,5 +109,5 @@ Java 17 / Spring Boot / Spring Security / Spring Data JPA / Thymeleaf / Oracle X
 
 - 웹 서버와 DB 서버를 분리하고, DB는 Tailscale 사설망으로만 접속
 - DB 접속 정보는 별도 파일로 분리해 Git에서 제외
-- Windows Server → Ubuntu Server 이전, systemd로 상시 구동, 포트 개방 없이 Cloudflare Tunnel로 공개
+- Windows → Ubuntu Server 이전, systemd로 상시 구동, 포트 개방 없이 Cloudflare Tunnel로 공개
 - 관리자 화면에서 IP 차단 기능 구현
