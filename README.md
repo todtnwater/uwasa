@@ -38,7 +38,7 @@
 
 ### システム構成
 
-~~
+~~~
 ブラウザ
    │ HTTPS
    ▼
@@ -51,7 +51,7 @@ Webサーバー（Ubuntu Server）
          ▼
 DBサーバー（Ubuntu Server）
    └─ Oracle Database XE 21c（Docker）
-~~
+~~~
 
 ### 工夫した点
 
@@ -64,24 +64,24 @@ DBサーバー（Ubuntu Server）
 
 1. リポジトリをクローン
 
-~~bash
+~~~bash
 git clone https://github.com/todtnwater/uwasa.git
 cd uwasa
-~~
+~~~
 
 2. DB接続情報ファイルを作成
 
-~~bash
+~~~bash
 cp src/main/resources/application-secret.properties.example src/main/resources/application-secret.properties
-~~
+~~~
 
 作成した `application-secret.properties` に、ご自身のDB接続情報を入力してください。
 
 3. 実行
 
-~~bash
+~~~bash
 ./mvnw spring-boot:run
-~~
+~~~
 
 `http://localhost:8083` でアクセスできます。
 
